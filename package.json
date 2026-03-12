@@ -1,0 +1,48 @@
+{
+  "name": "kumbil",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.4.2",
+    "@prisma/client": "^6.4.1",
+    "bcryptjs": "^3.0.3",
+    "gray-matter": "^4.0.3",
+    "jose": "^6.2.1",
+    "mariadb": "^3.5.2",
+    "next": "15.5.0",
+    "nodemailer": "^7.0.6",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
+    "server-only": "^0.0.1",
+    "uuid": "^13.0.0",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.18",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.18.0",
+    "@types/nodemailer": "^7.0.11",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.21",
+    "dotenv": "^17.3.1",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "15.5.0",
+    "postcss": "^8.5.6",
+    "prisma": "^6.4.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.2"
+  }
+}

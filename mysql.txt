@@ -1,0 +1,3 @@
+main_pass: Kumbil_DB_Strong2026
+
+user :  kumbil_user , kumbil@2026

@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+// ─── Admin ──────────────────────────────────────────
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Category ───────────────────────────────────────
+
+model Category {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  slug          String    @unique
+  description   String?   @db.Text
+  image         String?
+  subcategories String?   @db.Text     // JSON array of subcategory names
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+// ─── Farmer ─────────────────────────────────────────
+
+model Farmer {
+  id          String    @id @default(cuid())
+  name        String
+  photo       String?
+  farmName    String
+  village     String
+  region      String
+  since       Int
+  crops       String?   @db.Text   // JSON array
+  description String?   @db.Text
+  lat         Float?
+  lng         Float?
+  products    Product[]
+  batches     Batch[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ─── Product ────────────────────────────────────────
+
+model Product {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  description     String?          @db.Text
+  longDescription String?          @db.LongText
+  image1          String?
+  image2          String?
+  image3          String?
+  price           Float?
+  comparePrice    Float?
+  stock           Int              @default(0)
+  status          String           @default("draft")
+  featured        Boolean          @default(false)
+  subcategory     String?
+  avgRating       Float            @default(0)
+  reviewCount     Int              @default(0)
+  categoryId      String?
+  category        Category?        @relation(fields: [categoryId], references: [id])
+  farmerId        String?
+  farmer          Farmer?          @relation(fields: [farmerId], references: [id])
+  variants        ProductVariant[]
+  reviews         Review[]
+  batches         Batch[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([farmerId])
+}
+
+// ─── Product Variant ────────────────────────────────
+
+model ProductVariant {
+  id           String  @id @default(cuid())
+  weight       String
+  price        Float
+  comparePrice Float?
+  stock        Int     @default(0)
+  sku          String  @unique
+  productId    String
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+// ─── Batch (Order-to-Origin Tracking) ───────────────
+
+model Batch {
+  id            String   @id @default(cuid())
+  batchNumber   String   @unique
+  harvestDate   DateTime
+  qualityReport String?  @db.Text
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  farmerId      String
+  farmer        Farmer   @relation(fields: [farmerId], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@index([batchNumber])
+  @@index([productId])
+}
+
+// ─── Review ─────────────────────────────────────────
+
+model Review {
+  id           String   @id @default(cuid())
+  rating       Int
+  comment      String?  @db.Text
+  customerName String
+  verified     Boolean  @default(false)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+}
+
+// ─── Customer ───────────────────────────────────────
+
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  phone       String?
+  location    String?
+  joinedAt    DateTime @default(now())
+  orderCount  Int      @default(0)
+  totalSpent  Float    @default(0)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+}
+
+// ─── Order ──────────────────────────────────────────
+
+model Order {
+  id            String    @id @default(cuid())
+  orderNumber   String    @unique
+  customerName  String
+  customerEmail String
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  items         String    @db.LongText // JSON array
+  total         Float
+  status        String    @default("pending")
+  paymentMethod String?
+  
+  // Shipping Address fields
+  phone         String?
+  address       String?   @db.Text
+  city          String?
+  state         String?
+  pincode       String?
+  country       String?   @default("India")
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([orderNumber])
+  @@index([customerId])
+}
+
+// ─── Coupon ─────────────────────────────────────────
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Float
+  type        String   @default("percentage") // "percentage" | "fixed"
+  minOrder    Float    @default(0)
+  maxDiscount Float?
+  expiresAt   DateTime
+  active      Boolean  @default(true)
+  usageCount  Int      @default(0)
+  usageLimit  Int      @default(100)
+  createdAt   DateTime @default(now())
+
+  @@index([code])
+}
+
+// ─── Blog ───────────────────────────────────────────
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?  @db.Text
+  content     String?  @db.LongText
+  category    String?
+  image       String?
+  author      String?
+  readTime    Int      @default(5)
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// ─── Site Settings ──────────────────────────────────
+
+model SiteSettings {
+  id       String   @id @default(cuid())
+  key      String   @unique
+  value    String   @db.LongText
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Wishlist ───────────────────────────────────────
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String?
+  sessionId String?
+  productId String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+}
