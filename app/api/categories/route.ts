@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         slug,
         description: description || "",
         image: image || "",
-        subcategoriesList: subcategories ? JSON.stringify(subcategories) : "[]",
+        subcategories: subcategories ? JSON.stringify(subcategories) : "[]",
       },
     });
 
