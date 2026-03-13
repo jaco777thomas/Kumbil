@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import cloudinary from "@/lib/cloudinary";
 
 export async function POST(request: Request) {
   try {
@@ -15,24 +13,25 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const fileExtension = path.extname(file.name);
-    const fileName = `${uuidv4()}${fileExtension}`;
-    
-    // Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (err) {
-      // Ignore if directory already exists
-    }
+    // Upload to Cloudinary using a promise to handle the buffer
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "kumbil_uploads",
+          resource_type: "auto",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    }) as any;
 
-    const filePath = path.join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
-
-    const relativePath = `/uploads/${fileName}`;
-
-    return NextResponse.json({ success: true, url: relativePath });
+    return NextResponse.json({ 
+      success: true, 
+      url: result.secure_url 
+    });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(

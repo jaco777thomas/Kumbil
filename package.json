@@ -13,6 +13,7 @@
     "@prisma/adapter-mariadb": "^7.4.2",
     "@prisma/client": "^6.4.1",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
     "gray-matter": "^4.0.3",
     "jose": "^6.2.1",
     "mariadb": "^3.5.2",
