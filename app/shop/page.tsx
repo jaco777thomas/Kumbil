@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ui/ProductCard";
 import ShopFilters from "./ShopFilters";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = {
   searchParams: Promise<{
     category?: string;

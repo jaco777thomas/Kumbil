@@ -5,6 +5,8 @@ import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/ui/ProductCard";
 import HeroSlider from "@/components/ui/HeroSlider";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   // Fetch live data from DB
   const [categories, featuredProducts, farmers, blogPosts] = await Promise.all([
