@@ -1,24 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import dotenv from "dotenv";
+import { hashPassword } from "../lib/password";
 
-dotenv.config();
-
-function parseDbUrl(url: string) {
-  try {
-    const u = new URL(url);
-    return { host: u.hostname, port: u.port ? parseInt(u.port) : 3306, user: u.username, password: decodeURIComponent(u.password), database: u.pathname.replace(/^\//, ""), };
-  } catch {
-    return { host: "localhost", port: 3306, user: "root", password: "Kumbil_DB_Strong2026", database: "kumbil_db", };
-  }
-}
-
-const dbConfig = parseDbUrl(process.env.DATABASE_URL || "");
-const adapter = new PrismaMariaDb(dbConfig);
-const prisma = new PrismaClient({ adapter } as any);
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Bulk Migration & Seeding Started...')
+
+  const commonPassword = await hashPassword("Admin@123");
+  const userPassword = await hashPassword("User@123");
 
   try {
     // 1. Clean data
@@ -38,8 +27,8 @@ async function main() {
     console.log('Seeding Admins...')
     await prisma.admin.createMany({
       data: [
-        { id: 'admin-1', name: 'Administrator', email: 'admin@kumbil.in', password: 'admin', role: 'superadmin' },
-        { id: 'admin-2', name: 'Jacob Thomas', email: 'jacob@kumbil.in', password: 'password123', role: 'admin' },
+        { id: 'admin-1', name: 'Administrator', email: 'admin@kumbil.in', password: commonPassword, role: 'superadmin' },
+        { id: 'admin-2', name: 'Jacob Thomas', email: 'jacob@kumbil.in', password: commonPassword, role: 'admin' },
       ]
     })
 
@@ -70,9 +59,9 @@ async function main() {
     console.log('Seeding Customers...')
     await prisma.customer.createMany({
       data: [
-        { id: 'cust-1', name: "Jacob Thomas", email: "jacob@email.com", password: "password123", phone: "+91 98765 43210", location: "Kochi, Kerala", totalSpent: 18450, orderCount: 12 },
-        { id: 'cust-2', name: "Mohammed Rashid", email: "rashid@email.com", password: "password123", phone: "+971 50 123 4567", location: "Dubai, UAE", totalSpent: 8200, orderCount: 4 },
-        { id: 'cust-3', name: "Priya Krishnan", email: "priya@email.com", password: "password123", phone: "+91 99887 76655", location: "Bangalore, Karnataka", totalSpent: 4560, orderCount: 3 },
+        { id: 'cust-1', name: "Jacob Thomas", email: "jacob@email.com", password: userPassword, phone: "+91 98765 43210", location: "Kochi, Kerala", totalSpent: 18450, orderCount: 12 },
+        { id: 'cust-2', name: "Mohammed Rashid", email: "rashid@email.com", password: userPassword, phone: "+971 50 123 4567", location: "Dubai, UAE", totalSpent: 8200, orderCount: 4 },
+        { id: 'cust-3', name: "Priya Krishnan", email: "priya@email.com", password: userPassword, phone: "+91 99887 76655", location: "Bangalore, Karnataka", totalSpent: 4560, orderCount: 3 },
       ]
     })
 
